@@ -156,6 +156,7 @@ function create() {
     this.cameras.main.setBackgroundColor('#87CEEB');
 
 
+    alert('-0-');
     carSound = this.sound.add('carSound');
     trainSound = this.sound.add('trainSound');
     coinSound = this.sound.add('coinSound');
