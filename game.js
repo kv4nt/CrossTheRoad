@@ -279,7 +279,7 @@ function create() {
 }
 
 function update(time, delta) {
-    if (gameOver || dialogVisible) return;
+    //temp//if (gameOver || dialogVisible) return;
 
     updateVehicles(delta);
     handlePlayerInput(this);
