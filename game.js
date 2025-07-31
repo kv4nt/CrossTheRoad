@@ -153,7 +153,7 @@ function preload() {
 
 
 function create() {
-    this.cameras.main.setBackgroundColor('#87CEEB');
+    //this.cameras.main.setBackgroundColor('#87CEEB');
 
 
     alert('-0-');
