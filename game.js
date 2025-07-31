@@ -171,6 +171,7 @@ function create() {
     obstaclesGroup = this.physics.add.staticGroup();
     placeObstacles(this);
 
+    // Создаём игрока
     player = this.physics.add.sprite(0, 0, 'idle_down')
         .setScale(2)
         .setCollideWorldBounds(true);
@@ -178,11 +179,15 @@ function create() {
     player.setSize(8, 16);
     player.setOffset(0, 0);
 
+    const colWidth = config.width / COLS;
+    const leftPadding = 8;
+
+    // Позиционирование игрока по центру по горизонтали и нижней строке
     player.gridCol = Math.floor(COLS / 2);
     player.gridRow = 0;
 
-    player.x = player.gridCol * colWidth + colWidth / 2;
-    player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
+    player.x = player.gridCol * colWidth + colWidth / 2;  // по центру колонки
+    player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT; // низ строки
 
     player.currentDirection = null;
     player.isMoving = false;
@@ -237,27 +242,18 @@ function create() {
     this.physics.add.overlap(player, coinsGroupSilver, collectCoin, null, this);
     this.physics.add.overlap(player, coinsGroupGold, collectCoin, null, this);
 
-    const colWidth = config.width / COLS;
-    const leftPadding = 8;
-    player.x = player.gridCol * colWidth + leftPadding;
-    player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
-
-    // --- Стартовое окно ---
+    // --- Стартовое окно с кнопкой ---
+    gameOver = true; // блокировка игры до старта
 
     const centerX = config.width / 2;
     const centerY = config.height / 2;
 
-    // Фон полупрозрачный
     const startBg = this.add.rectangle(centerX, centerY, config.width, config.height, 0x000000, 0.7).setDepth(500);
-
-    // Текст приветствия
     const startText = this.add.text(centerX, centerY - 50, 'Добро пожаловать в игру!', {
         fontSize: '28px',
         fill: '#ffffff',
         fontStyle: 'bold'
     }).setOrigin(0.5).setDepth(501);
-
-    // Кнопка "Начать игру"
     const startButton = this.add.text(centerX, centerY + 50, 'Начать игру', {
         fontSize: '24px',
         fill: '#00ff00',
@@ -269,17 +265,14 @@ function create() {
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(501);
 
     startButton.on('pointerdown', () => {
-        // Убираем стартовое окно
         startBg.destroy();
         startText.destroy();
         startButton.destroy();
 
-        // Запускаем фоновый звук по первому взаимодействию
         if (!backgroundSound.isPlaying) {
             backgroundSound.play();
         }
 
-        // Разрешаем обновление игры
         gameOver = false;
     });
 }
@@ -768,6 +761,7 @@ function showLevelComplete(scene) {
 function resetLevel(scene) {
     scene.messageText.setAlpha(0);
     scene.messageText.setVisible(false);
+
     world = generateLevel(level);
     obstacles = generateObstacles(level);
     drawWorld(scene);
@@ -775,15 +769,15 @@ function resetLevel(scene) {
     createVehicles(scene);
     placeCoins(scene);
 
-    player.gridRow = 0;
-    player.gridCol = 0;
     const colWidth = config.width / COLS;
-    const leftPadding = 8;
+
+    // Позиционирование игрока - центр по горизонтали, самая нижняя строка
     player.gridCol = Math.floor(COLS / 2);
     player.gridRow = 0;
 
     player.x = player.gridCol * colWidth + colWidth / 2;
     player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
+
     player.currentDirection = null;
     player.isMoving = false;
 
