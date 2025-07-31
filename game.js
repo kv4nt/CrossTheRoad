@@ -156,16 +156,16 @@ function create() {
     this.cameras.main.setBackgroundColor('#87CEEB');
 
 
-    // carSound = this.sound.add('carSound');
-    // trainSound = this.sound.add('trainSound');
-    // coinSound = this.sound.add('coinSound');
-    // stepSound = this.sound.add('stepSound');
-    // backgroundSound = this.sound.add('backgroundSound', { loop: true });
-    // this.input.once('pointerdown', () => {
-    //     if (!backgroundSound.isPlaying) {
-    //         backgroundSound.play();
-    //     }
-    // });
+    carSound = this.sound.add('carSound');
+    trainSound = this.sound.add('trainSound');
+    coinSound = this.sound.add('coinSound');
+    stepSound = this.sound.add('stepSound');
+    backgroundSound = this.sound.add('backgroundSound', { loop: true });
+    this.input.once('pointerdown', () => {
+        if (!backgroundSound.isPlaying) {
+            backgroundSound.play();
+        }
+    });
     world = generateLevel(level);
     obstacles = generateObstacles(level);
 
