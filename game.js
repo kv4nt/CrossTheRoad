@@ -645,7 +645,7 @@ function handlePlayerInput(scene) {
 
     const colWidth = config.width / COLS;
     const leftPadding = 8;
-
+/*
     if (Phaser.Input.Keyboard.JustDown(scene.cursors.up) || Phaser.Input.Keyboard.JustDown(scene.wasd.up)) {
         if (player.gridRow < ROWS - 1 && !isObstacleAt(player.gridRow + 1, player.gridCol)) {
             newRow++;
@@ -671,7 +671,7 @@ function handlePlayerInput(scene) {
             moved = true;
         }
     }
-
+*/
     if (moved) {
         stepSound.play();
         player.isMoving = true;
