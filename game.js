@@ -178,8 +178,12 @@ function create() {
     player.setSize(8, 16);
     player.setOffset(0, 0);
 
-    player.gridRow = 0; // самая нижняя строка
-    player.gridCol = 0; // самая левая колонка
+    player.gridCol = Math.floor(COLS / 2);
+    player.gridRow = 0;
+
+    player.x = player.gridCol * colWidth + colWidth / 2;
+    player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
+
     player.currentDirection = null;
     player.isMoving = false;
     player.moveTween = null;
@@ -775,7 +779,10 @@ function resetLevel(scene) {
     player.gridCol = 0;
     const colWidth = config.width / COLS;
     const leftPadding = 8;
-    player.x = player.gridCol * colWidth + leftPadding;
+    player.gridCol = Math.floor(COLS / 2);
+    player.gridRow = 0;
+
+    player.x = player.gridCol * colWidth + colWidth / 2;
     player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
     player.currentDirection = null;
     player.isMoving = false;
