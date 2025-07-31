@@ -6,7 +6,7 @@ const config = {
     parent: 'game',
     physics: {
         default: 'arcade',
-        arcade: { debug: true }
+        arcade: { debug: false }
     },
     scene: {
         preload,
