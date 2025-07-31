@@ -156,20 +156,17 @@ function create() {
     //this.cameras.main.setBackgroundColor('#87CEEB');
 
 
-    alert('-0-');
+
     carSound = this.sound.add('carSound');
     trainSound = this.sound.add('trainSound');
     coinSound = this.sound.add('coinSound');
     stepSound = this.sound.add('stepSound');
-    alert('-1');
     backgroundSound = this.sound.add('backgroundSound', { loop: true });
-alert(0);
     this.input.once('pointerdown', () => {
         if (!backgroundSound.isPlaying) {
             backgroundSound.play();
         }
     });
-alert(1);
     world = generateLevel(level);
     obstacles = generateObstacles(level);
 
