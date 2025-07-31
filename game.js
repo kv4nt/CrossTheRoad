@@ -163,7 +163,7 @@ function create() {
 
     this.input.once('pointerdown', () => {
         if (!backgroundSound.isPlaying) {
-            backgroundSound.play();
+           // backgroundSound.play();
         }
     });
 
