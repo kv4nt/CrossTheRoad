@@ -157,6 +157,7 @@ function create() {
 
 
     carSound = this.sound.add('carSound');
+    alert(1);
     trainSound = this.sound.add('trainSound');
     coinSound = this.sound.add('coinSound');
     stepSound = this.sound.add('stepSound');
