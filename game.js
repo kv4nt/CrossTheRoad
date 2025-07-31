@@ -6,7 +6,7 @@ const config = {
     parent: 'game',
     physics: {
         default: 'arcade',
-        arcade: { debug: false }
+        arcade: { debug: true }
     },
     scene: {
         preload,
@@ -52,64 +52,6 @@ let savedPlayerPos = null;
 let backgroundSound, carSound, trainSound, coinSound, stepSound;
 
 function preload() {
-    var progressBar = this.add.graphics();
-    var progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(40, 270, 220, 50);
-
-    var width = this.cameras.main.width;
-    var height = this.cameras.main.height;
-    var loadingText = this.make.text({
-        x: width / 2,
-        y: height / 2 - 50,
-        text: 'Loading...',
-        style: {
-            font: '20px monospace',
-            fill: '#ffffff'
-        }
-    });
-    loadingText.setOrigin(0.5, 0.5);
-
-    var percentText = this.make.text({
-        x: width / 2,
-        y: height / 2 - 5,
-        text: '0%',
-        style: {
-            font: '18px monospace',
-            fill: '#ffffff'
-        }
-    });
-    percentText.setOrigin(0.5, 0.5);
-
-    var assetText = this.make.text({
-        x: width / 2,
-        y: height / 2 + 70,
-        text: '',
-        style: {
-            font: '18px monospace',
-            fill: '#ffffff'
-        }
-    });
-    assetText.setOrigin(0.5, 0.5);
-
-    this.load.on('progress', function (value) {
-        percentText.setText(parseInt(value * 100) + '%');
-        progressBar.clear();
-        progressBar.fillStyle(0xffffff, 1);
-        progressBar.fillRect(40, 270, 300 * value, 30);
-    });
-
-    this.load.on('fileprogress', function (file) {
-        assetText.setText('Loading asset: ' + file.key);
-    });
-
-    this.load.on('complete', function () {
-        progressBar.destroy();
-        progressBox.destroy();
-        loadingText.destroy();
-        percentText.destroy();
-        assetText.destroy();
-    });
     // Анимации игрока
     this.load.spritesheet('idle_down', 'assets/businessman1_idle_down.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
     this.load.spritesheet('idle_up', 'assets/businessman1_idle_up.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
@@ -145,7 +87,7 @@ function preload() {
     this.load.image('gold_coin', 'assets/gold_coin.png');
 
     // Звуки
-    this.load.audio('backgroundSound', 'sound/background.mp3');
+    this.load.audio('backgroundSound', 'sound/background.wav');
     this.load.audio('carSound', 'sound/car.wav');
     this.load.audio('trainSound', 'sound/train.ogg');
     this.load.audio('coinSound', 'sound/coin.wav');
@@ -176,7 +118,6 @@ function create() {
     obstaclesGroup = this.physics.add.staticGroup();
     placeObstacles(this);
 
-    // *** Сначала создаем игрока ***
     player = this.physics.add.sprite(0, 0, 'idle_down')
         .setScale(2)
         .setCollideWorldBounds(true);
@@ -184,15 +125,14 @@ function create() {
     player.setSize(8, 16);
     player.setOffset(0, 0);
 
-    player.gridRow = 0; // самая нижняя строка
-    player.gridCol = 0; // самая левая колонка
+    player.gridRow = 0;
+    player.gridCol = 0;
     player.currentDirection = null;
     player.isMoving = false;
     player.moveTween = null;
 
     createPlayerAnimations(this);
 
-    // *** После игрока создаём группы монет ***
     coinsGroupBronze = this.physics.add.group();
     coinsGroupSilver = this.physics.add.group();
     coinsGroupGold = this.physics.add.group();
@@ -236,30 +176,169 @@ function create() {
         if (!dialogVisible && isPlayerOnDangerRow()) onPlayerHit(this, 'поезд');
     }, null, this);
 
-    // Сбор обычных монет
     this.physics.add.overlap(player, coinsGroupBronze, collectCoin, null, this);
-    // Сбор серебряных монет
     this.physics.add.overlap(player, coinsGroupSilver, collectCoin, null, this);
-    // Сбор золотых монет
     this.physics.add.overlap(player, coinsGroupGold, collectCoin, null, this);
 
-    // Устанавливаем позицию игрока на начало нулевой строки с leftPadding
     const colWidth = config.width / COLS;
     const leftPadding = 8;
     player.x = player.gridCol * colWidth + leftPadding;
     player.y = config.height - (player.gridRow + 0.5) * ROW_HEIGHT;
+
+    // --- Добавляем мобильное управление ---
+    // Переменные для свайпа
+    this.input.on('pointerdown', onPointerDown, this);
+    this.input.on('pointerup', onPointerUp, this);
+
+    this.touchStartPos = null;
+    this.touchEndPos = null;
 }
 
 function update(time, delta) {
     if (gameOver || dialogVisible) return;
 
     updateVehicles(delta);
-    handlePlayerInput(this);
+    handlePlayerInput(this); // Для клавиатуры
+
+    // Мобильный ввод обновляется через слушатели pointerdown / pointerup
 
     if (player.gridRow >= ROWS - 1) {
         showLevelComplete(this);
     }
 }
+
+// Обработчики для моб. управления
+function onPointerDown(pointer) {
+    if (gameOver || dialogVisible) return;
+
+    this.touchStartPos = { x: pointer.x, y: pointer.y };
+}
+
+function onPointerUp(pointer) {
+    if (gameOver || dialogVisible) return;
+    if (!this.touchStartPos) return;
+
+    this.touchEndPos = { x: pointer.x, y: pointer.y };
+
+    const deltaX = this.touchEndPos.x - this.touchStartPos.x;
+    const deltaY = this.touchEndPos.y - this.touchStartPos.y;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    const swipeThreshold = 20; // минимальное расстояние для распознавания свайпа
+
+    // Если это тап (не свайп), перемещение в зависимости от позиции касания по отношению к игроку
+    if (absX < swipeThreshold && absY < swipeThreshold) {
+        handleTapInput(this, this.touchEndPos.x, this.touchEndPos.y);
+    } else {
+        // Это свайп — определяем направление
+        if (absX > absY) {
+            if (deltaX > 0) movePlayer(this, 'right');
+            else movePlayer(this, 'left');
+        } else {
+            if (deltaY > 0) movePlayer(this, 'down');
+            else movePlayer(this, 'up');
+        }
+    }
+    this.touchStartPos = null;
+    this.touchEndPos = null;
+}
+
+// При тапе — определяем направление движения к экрану от позиции игрока
+function handleTapInput(scene, tapX, tapY) {
+    if (player.isMoving) return;
+    const colWidth = config.width / COLS;
+    const leftPadding = 8;
+
+    const playerX = player.x;
+    const playerY = player.y;
+
+    // Разница по координатам между тапом и игроком
+    const diffX = tapX - playerX;
+    const diffY = tapY - playerY;
+
+    // Если тап близко к игроку, ничего не делаем
+    if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) return;
+
+    // Определяем главную ось движения (больше смещения)
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) movePlayer(scene, 'right');
+        else movePlayer(scene, 'left');
+    } else {
+        if (diffY > 0) movePlayer(scene, 'down');
+        else movePlayer(scene, 'up');
+    }
+}
+
+// Функция движения игрока в конкретном направлении (если возможно)
+function movePlayer(scene, direction) {
+    if (player.isMoving || gameOver || dialogVisible) return;
+
+    let newRow = player.gridRow;
+    let newCol = player.gridCol;
+
+    switch (direction) {
+        case 'up':
+            if (player.gridRow < ROWS - 1 && !isObstacleAt(player.gridRow + 1, player.gridCol)) {
+                newRow++;
+            } else return;
+            break;
+        case 'down':
+            if (player.gridRow > 0 && !isObstacleAt(player.gridRow - 1, player.gridCol)) {
+                newRow--;
+            } else return;
+            break;
+        case 'left':
+            if (player.gridCol > 0 && !isObstacleAt(player.gridRow, player.gridCol - 1)) {
+                newCol--;
+            } else return;
+            break;
+        case 'right':
+            if (player.gridCol < COLS - 1 && !isObstacleAt(player.gridRow, player.gridCol + 1)) {
+                newCol++;
+            } else return;
+            break;
+        default:
+            return;
+    }
+
+    player.isMoving = true;
+    player.currentDirection = direction;
+
+    const colWidth = config.width / COLS;
+    const leftPadding = 8;
+
+    const newX = newCol * colWidth + leftPadding;
+    const newY = config.height - (newRow + 0.5) * ROW_HEIGHT;
+
+    player.anims.play(`walk_${direction}`, true);
+
+    if (player.moveTween) {
+        player.moveTween.stop();
+        player.moveTween = null;
+    }
+
+    stepSound.play();
+
+    player.moveTween = scene.tweens.add({
+        targets: player,
+        x: newX,
+        y: newY,
+        duration: 150,
+        onComplete: () => {
+            player.gridRow = newRow;
+            player.gridCol = newCol;
+            player.isMoving = false;
+            player.moveTween = null;
+
+            let currentAnimKey = player.anims.currentAnim ? player.anims.currentAnim.key : null;
+            if (!currentAnimKey || !currentAnimKey.startsWith('idle_')) {
+                player.anims.play(`idle_${direction}`, true);
+            }
+        }
+    });
+}
+
 
 function generateLevel(level) {
     const worldRows = [];
