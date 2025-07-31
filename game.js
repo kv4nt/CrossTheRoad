@@ -161,7 +161,11 @@ function create() {
     coinSound = this.sound.add('coinSound');
     stepSound = this.sound.add('stepSound');
 
-    backgroundSound.play();
+    this.input.once('pointerdown', () => {
+        if (!backgroundSound.isPlaying) {
+            backgroundSound.play();
+        }
+    });
 
     world = generateLevel(level);
     obstacles = generateObstacles(level);
