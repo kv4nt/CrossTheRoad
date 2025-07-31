@@ -6,7 +6,7 @@ const config = {
     parent: 'game',
     physics: {
         default: 'arcade',
-        arcade: { debug: true }
+        arcade: { debug: false }
     },
     scene: {
         preload,
@@ -153,15 +153,14 @@ function preload() {
 
 
 function create() {
-    //this.cameras.main.setBackgroundColor('#87CEEB');
+    this.cameras.main.setBackgroundColor('#87CEEB');
 
 
-    carSound = this.sound.add('carSound');
-    alert(1);
-    trainSound = this.sound.add('trainSound');
-    coinSound = this.sound.add('coinSound');
-    stepSound = this.sound.add('stepSound');
-    backgroundSound = this.sound.add('backgroundSound', { loop: true });
+    // carSound = this.sound.add('carSound');
+    // trainSound = this.sound.add('trainSound');
+    // coinSound = this.sound.add('coinSound');
+    // stepSound = this.sound.add('stepSound');
+    // backgroundSound = this.sound.add('backgroundSound', { loop: true });
     this.input.once('pointerdown', () => {
         if (!backgroundSound.isPlaying) {
             backgroundSound.play();
