@@ -144,11 +144,11 @@ function preload() {
     this.load.image('gold_coin', 'assets/gold_coin.png');
 
     // Заменено на .mp3, как вы просили
-    this.load.audio('backgroundSound', 'sound/background.mp3');
-    this.load.audio('carSound', 'sound/car.wav');
-    this.load.audio('trainSound', 'sound/train.ogg');
-    this.load.audio('coinSound', 'sound/coin.wav');
-    this.load.audio('stepSound', 'sound/step.wav');
+    // this.load.audio('backgroundSound', 'sound/background.mp3');
+    // this.load.audio('carSound', 'sound/car.wav');
+    // this.load.audio('trainSound', 'sound/train.ogg');
+    // this.load.audio('coinSound', 'sound/coin.wav');
+    // this.load.audio('stepSound', 'sound/step.wav');
 }
 
 
@@ -156,16 +156,16 @@ function create() {
     this.cameras.main.setBackgroundColor('#87CEEB');
 
 
-    carSound = this.sound.add('carSound');
-    trainSound = this.sound.add('trainSound');
-    coinSound = this.sound.add('coinSound');
-    stepSound = this.sound.add('stepSound');
-    backgroundSound = this.sound.add('backgroundSound', { loop: true });
-    this.input.once('pointerdown', () => {
-        if (!backgroundSound.isPlaying) {
-            backgroundSound.play();
-        }
-    });
+    // carSound = this.sound.add('carSound');
+    // trainSound = this.sound.add('trainSound');
+    // coinSound = this.sound.add('coinSound');
+    // stepSound = this.sound.add('stepSound');
+    // backgroundSound = this.sound.add('backgroundSound', { loop: true });
+    // this.input.once('pointerdown', () => {
+    //     if (!backgroundSound.isPlaying) {
+    //         backgroundSound.play();
+    //     }
+    // });
     world = generateLevel(level);
     obstacles = generateObstacles(level);
 
@@ -379,7 +379,7 @@ function movePlayer(scene, direction) {
         player.moveTween = null;
     }
 
-    stepSound.play();
+    // stepSound.play();
 
     player.moveTween = scene.tweens.add({
         targets: player,
@@ -672,7 +672,7 @@ function handlePlayerInput(scene) {
     }
 
     if (moved) {
-        stepSound.play();
+        // stepSound.play();
         player.isMoving = true;
         player.currentDirection = newDir;
 
@@ -723,7 +723,7 @@ function collectCoin(player, coin) {
     else if (coinsGroupGold.contains(coin)) value = COIN_TYPES.gold.value;
 
     coins += value;
-    coinSound.play();
+    // coinSound.play();
     this.coinsText.setText(`Монеты: ${coins}`);
 }
 
@@ -741,9 +741,9 @@ function onPlayerHit(scene, hitType) {
         scene.levelText.setText(`Уровень: ${level}`);
 
         if (hitType === 'машина') {
-            carSound.play();
+            // carSound.play();
         } else {
-            trainSound.play();
+            // trainSound.play();
         }
 
         const message = hitType === 'машина' ? 'Вас сбила машина!' : 'Вас сбил поезд!';
