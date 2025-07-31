@@ -160,13 +160,13 @@ function create() {
     trainSound = this.sound.add('trainSound');
     coinSound = this.sound.add('coinSound');
     stepSound = this.sound.add('stepSound');
-
+alert(0);
     this.input.once('pointerdown', () => {
         if (!backgroundSound.isPlaying) {
             backgroundSound.play();
         }
     });
-
+alert(1);
     world = generateLevel(level);
     obstacles = generateObstacles(level);
 
