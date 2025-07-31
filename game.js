@@ -145,7 +145,7 @@ function preload() {
     this.load.image('gold_coin', 'assets/gold_coin.png');
 
     // Звуки
-    this.load.audio('backgroundSound', 'sound/background.wav');
+    this.load.audio('backgroundSound', 'sound/background.mp3');
     this.load.audio('carSound', 'sound/car.wav');
     this.load.audio('trainSound', 'sound/train.ogg');
     this.load.audio('coinSound', 'sound/coin.wav');
