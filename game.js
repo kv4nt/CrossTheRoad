@@ -25,7 +25,7 @@ const OBSTACLE_TYPES = ['stone', 'tree', 'water', 'fence', 'house'];
 // Типы монет с ключами спрайтов, ценностью и масштабом
 const COIN_TYPES = {
     bronze: { key: 'bronze_coin', value: 1, scale: 1.2 },
-    silver: { key: 'silver_coin', value: 3, scale: 1.5 },
+    silver: { key: 'silver_coin', value: 2, scale: 1.5 }, // изменили с 3 на 2
     gold: { key: 'gold_coin', value: 5, scale: 1.7 }
 };
 
@@ -130,7 +130,8 @@ function preload() {
 
     this.load.image('road', 'assets/road.png');
     this.load.image('rail', 'assets/rail.png');
-    this.load.image('grass', 'assets/grass.png');
+    this.load.image('grass_1', 'assets/grass_1.png'); // новый вариант травы 1
+    this.load.image('grass_2', 'assets/grass_2.png'); // новый вариант травы 2
 
     this.load.image('stone', 'assets/stone.png');
     this.load.image('tree', 'assets/tree.png');
@@ -338,9 +339,16 @@ function drawWorld(scene) {
     for (let i = 0; i < ROWS; i++) {
         const y = config.height - (i + 0.5) * ROW_HEIGHT;
         const type = world[i].type;
-        let texture = 'grass';
-        if (type === 'road') texture = 'road';
-        else if (type === 'rail') texture = 'rail';
+        let texture = 'grass_1'; // по умолчанию grass_1
+
+        if (type === 'grass') {
+            // Рандомно выбираем grass_1 или grass_2
+            texture = (Math.random() < 0.5) ? 'grass_1' : 'grass_2';
+        } else if (type === 'road') {
+            texture = 'road';
+        } else if (type === 'rail') {
+            texture = 'rail';
+        }
         scene.add.tileSprite(config.width / 2, y, config.width, ROW_HEIGHT, texture);
     }
 }
@@ -604,7 +612,7 @@ function handlePlayerInput(scene) {
 function collectCoin(player, coin) {
     coin.destroy();
 
-    let value = COIN_TYPES.bronze.value; // По умолчанию
+    let value = COIN_TYPES.bronze.value; // по умолчанию
     if (coinsGroupBronze.contains(coin)) value = COIN_TYPES.bronze.value;
     else if (coinsGroupSilver.contains(coin)) value = COIN_TYPES.silver.value;
     else if (coinsGroupGold.contains(coin)) value = COIN_TYPES.gold.value;
