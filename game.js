@@ -52,6 +52,7 @@ let savedPlayerPos = null;
 let backgroundSound, carSound, trainSound, coinSound, stepSound;
 
 function preload() {
+    // Прогресс-бар загрузки
     var progressBar = this.add.graphics();
     var progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
@@ -92,25 +93,27 @@ function preload() {
     });
     assetText.setOrigin(0.5, 0.5);
 
-    this.load.on('progress', function (value) {
+    this.load.on('progress', (value) => {
         percentText.setText(parseInt(value * 100) + '%');
         progressBar.clear();
         progressBar.fillStyle(0xffffff, 1);
         progressBar.fillRect(40, 270, 300 * value, 30);
     });
 
-    this.load.on('fileprogress', function (file) {
+    this.load.on('fileprogress', (file) => {
         assetText.setText('Loading asset: ' + file.key);
     });
 
-    this.load.on('complete', function () {
+    this.load.on('complete', () => {
         progressBar.destroy();
         progressBox.destroy();
         loadingText.destroy();
         percentText.destroy();
         assetText.destroy();
     });
-    // Анимации игрока
+
+    // your existing asset loading code below
+
     this.load.spritesheet('idle_down', 'assets/businessman1_idle_down.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
     this.load.spritesheet('idle_up', 'assets/businessman1_idle_up.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
     this.load.spritesheet('idle_left', 'assets/businessman1_idle_left.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
@@ -121,36 +124,33 @@ function preload() {
     this.load.spritesheet('walk_left', 'assets/businessman1_walk_left.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
     this.load.spritesheet('walk_right', 'assets/businessman1_walk_right.png', { frameWidth: 8, frameHeight: ROW_HEIGHT_PLAYER });
 
-    // Транспорт
     this.load.image('car', 'assets/car.png');
     for (let i = 1; i <= 4; i++) {
         this.load.image(`train_${i}`, `assets/train_${i}.png`);
     }
 
-    // Фон полос
     this.load.image('road', 'assets/road.png');
     this.load.image('rail', 'assets/rail.png');
     this.load.image('grass', 'assets/grass.png');
 
-    // Препятствия
     this.load.image('stone', 'assets/stone.png');
     this.load.image('tree', 'assets/tree.png');
     this.load.image('water', 'assets/water.png');
     this.load.image('fence', 'assets/fence.png');
     this.load.image('house', 'assets/house.png');
 
-    // Монеты трёх типов
     this.load.image('bronze_coin', 'assets/bronze_coin.png');
     this.load.image('silver_coin', 'assets/silver_coin.png');
     this.load.image('gold_coin', 'assets/gold_coin.png');
 
-    // Звуки
+    // Заменено на .mp3, как вы просили
     this.load.audio('backgroundSound', 'sound/background.mp3');
     this.load.audio('carSound', 'sound/car.wav');
     this.load.audio('trainSound', 'sound/train.ogg');
     this.load.audio('coinSound', 'sound/coin.wav');
     this.load.audio('stepSound', 'sound/step.wav');
 }
+
 
 function create() {
     this.cameras.main.setBackgroundColor('#87CEEB');
@@ -163,7 +163,7 @@ function create() {
 
     this.input.once('pointerdown', () => {
         if (!backgroundSound.isPlaying) {
-           // backgroundSound.play();
+            backgroundSound.play();
         }
     });
 
@@ -645,7 +645,7 @@ function handlePlayerInput(scene) {
 
     const colWidth = config.width / COLS;
     const leftPadding = 8;
-/*
+
     if (Phaser.Input.Keyboard.JustDown(scene.cursors.up) || Phaser.Input.Keyboard.JustDown(scene.wasd.up)) {
         if (player.gridRow < ROWS - 1 && !isObstacleAt(player.gridRow + 1, player.gridCol)) {
             newRow++;
@@ -671,7 +671,7 @@ function handlePlayerInput(scene) {
             moved = true;
         }
     }
-*/
+
     if (moved) {
         stepSound.play();
         player.isMoving = true;
